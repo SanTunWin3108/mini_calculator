@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Calculator</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <style>
+
+    </style>
+</head>
+<body class="bg-warning ">
+    <div id="app">
+        <div class="container mb-5">
+            <div class="row">
+                <div class="col-md-10 offset-md-1 col-lg-6 offset-lg-3 mt-5">
+                    <div class="card shadow mt-4">
+                        <div class="card-body">
+                            <div class="bg-dark  mb-3 text-white p-2 px-3 fw-bold rounded fs-3 text-end">
+                                <div>{{result}}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="mb-3">
+                                    <label class="fw-bold" for="">First Number</label>
+                                    <input type="number" class="form-control fw-bold" v-model="num1">
+                                    <small class="text-danger fw-bold " v-if="num1Err">Please enter first number</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="fw-bold" for="">Second Number</label>
+                                    <input type="number" class="form-control fw-bold" v-model="num2">
+                                    <small class="text-danger fw-bold " v-if="zeroErr">Cannot be divided by ZERO!</small>
+                                    <small class="text-danger fw-bold " v-if="num2Err">Please enter second number</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="fw-bold" for="">Operator</label>
+                                    <select class="form-control fw-bold" v-model="operator ">
+                                        <option class="fw-bold" value="+">Addition (+)</option>
+                                        <option class="fw-bold" value="-">Subtraction (-)</option>
+                                        <option class="fw-bold" value="x">Multiplication (x)</option>
+                                        <option class="fw-bold" value="÷">Division (÷)</option>
+                                    </select>
+                                </div>
+
+                                <div class="d-flex justify-content-between ">
+                                    <div class="w-100">
+                                        <button @click="calculate()" class="btn btn-dark fw-bold  py-2 w-100">Calculate</button>
+                                    </div>
+    
+                                    <div class="w-100 mx-2">
+                                        <button v-bind:disabled="resultStatus" @click="save()" class="btn btn-warning fw-bold   py-2 w-100">Save</button>
+                                    </div>
+    
+                                    <div class="w-100">
+                                        <button @click="clear()" class="btn btn-danger fw-bold py-2 w-100">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div>
+                                <h4>History</h4>
+                                <div class="bg-secondary text-end mb-2 text-white rounded p-2 fs-5 " v-for="h in history">
+                                    {{h}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- script -->
+    <script src="vue.js"></script>
+    <script>
+        let app = new Vue({
+            el : '#app',
+            data : {
+                num1 : null,
+                num2 : null,
+                operator : '+',
+                history : [],
+                zeroErr : false,
+                result : 0,
+                resultStatus : true,
+                num1Err : false,
+                num2Err : false
+            },
+
+            methods : {
+                calculate() {
+                    let answer = this.operate();
+                    if(answer || answer === 0) {
+                        this.result = `${this.num1} ${this.operator} ${this.num2} = ${answer}`;
+                    }
+                },
+
+                operate() {
+                    this.zeroErr = false;
+                    
+                    this.num1Err = (this.num1 === null || this.num1 === '') ? true : false;
+                    this.num2Err = (this.num2 === null || this.num2 === '') ? true : false;
+
+                    let firstNum = parseInt(this.num1);
+                    let secondNum = parseInt(this.num2);
+
+                    //if num1 and num2 are NOT EMPTY!
+                    if(this.num1 && this.num2) {
+                        this.resultStatus = false;
+
+                        if(this.operator === '+') {
+                            return firstNum + secondNum;
+                        } else if(this.operator === '-') {
+                            return firstNum - secondNum;
+                        } else if(this.operator === 'x') {
+                            return firstNum * secondNum;
+                        } else {
+                            if(this.num2 === '0') {
+                                this.zeroErr = true;
+                                
+                            } else {
+                                return firstNum / secondNum;
+                            }
+                        }
+                    } else {
+                        this.result = 0;
+                        this.resultStatus = true;
+                    } 
+                },
+
+                save() {
+                    if(this.result) {
+                        this.history.push(this.result);
+                    }
+                    this.reset();
+                },
+
+                clear() {
+                    this.zeroErr = false;
+                    this.history = [];
+                    this.reset();
+                },
+
+                reset() {
+                    this.resultStatus = true;
+                    this.result = 0;
+                    this.num1 = null;
+                    this.num2 = null;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
